@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>My Nikola Site</title><link>https://example.com/</link><description>This is a demo site for Nikola.</description><atom:link rel="self" type="application/rss+xml" href="https://example.com/rss.xml"></atom:link><language>en</language><copyright>Contents © 2018 &lt;a href="mailto:n.tesla@example.com"&gt;Nikola Tesla&lt;/a&gt; </copyright><lastBuildDate>Sun, 14 Jan 2018 22:39:10 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>test</title><link>https://example.com/posts/test/</link><dc:creator>Nikola Tesla</dc:creator><description>&lt;div tabindex="-1" id="notebook" class="border-box-sizing"&gt;
+    &lt;div class="container" id="notebook-container"&gt;
+
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Jupyter-Blogging-in-5-minutes."&gt;Jupyter Blogging in 5 minutes.&lt;a class="anchor-link" href="https://example.com/posts/test/#Jupyter-Blogging-in-5-minutes."&gt;¶&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Q: What is Jupyter Blogging?&lt;br&gt;
+A: Blogging with jupyter notebooks.&lt;/p&gt;
+&lt;p&gt;Q: Why Jupyter Blogging?&lt;br&gt;
+A: As a Data Scientists, I use jupyter to create notebooks with code, equations, visualizations, documentation, etc. "Jupyter Blogging" allows me to share those notebooks with the world without any additional work.&lt;/p&gt;
+&lt;p&gt;Q: How is this achieved?&lt;br&gt;
+A: &lt;a href="http://jupyter.org"&gt;Jupyter Notebook&lt;/a&gt; + 
+&lt;a href="https://pages.github.com"&gt;Github Pages&lt;/a&gt; + 
+&lt;a href="https://getnikola.com"&gt;Nikola&lt;/a&gt; = Jupyter Blogging.&lt;/p&gt;
+&lt;p&gt;This tutorial will give you basic instructions for setting up a minimum blog powered by jupyter notebooks. This tutorial is written on a jupyter notebook.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Github-Pages-initial-setup"&gt;Github Pages initial setup&lt;a class="anchor-link" href="https://example.com/posts/test/#Github-Pages-initial-setup"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Github Pages will do the hosting in addition to versioning of your blog.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a new repository named username.github.io, where username is your username (or organization name) on GitHub.&lt;/li&gt;
+&lt;li&gt;Clone it as so:
+&lt;pre&gt;&lt;code&gt;`shell
+git clone https://github.com/username/username.github.io
+cd username.github.io&lt;/code&gt;&lt;/pre&gt;
+In addition, any project you have on github that has a &lt;code&gt;gh-pages&lt;/code&gt; branch can be accessed via 
+&lt;pre&gt;&lt;code&gt;username.github.io/your-project&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Nikola-setup"&gt;Nikola setup&lt;a class="anchor-link" href="https://example.com/posts/test/#Nikola-setup"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Nikola will render all the HTML from the notebooks in a way that creates a blog structure.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Install Nikola with pip:&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pip install &lt;span class="s2"&gt;"Nikola[extras]"&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;Create Nikola project (inside website root directory):&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;nikola init .
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;In order to use Jupyter notebooks, we need to edit the conf.py file that was just generated. Scroll down until you see POSTS and PAGES declaration and add .ipynb files lines.&lt;pre&gt;
+POSTS = (
+ &lt;b&gt;("posts/*.ipynb", "posts", "post.tmpl"), # -- add this line&lt;/b&gt;
+ ("posts/*.rst", "posts", "post.tmpl"),
+ ("posts/*.md", "posts", "post.tmpl"),
+ ("posts/*.txt", "posts", "post.tmpl"),
+ ("posts/*.html", "posts", "post.tmpl"),
+)
+PAGES = (
+ &lt;b&gt;("pages/*.ipynb", "pages", "page.tmpl"), # -- add this line&lt;/b&gt;
+ ("pages/*.rst", "pages", "page.tmpl"),
+ ("pages/*.md", "pages", "page.tmpl"),
+ ("pages/*.txt", "pages", "page.tmpl"),
+ ("pages/*.html", "pages", "page.tmpl"),
+)
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Create-a-post"&gt;Create a post&lt;a class="anchor-link" href="https://example.com/posts/test/#Create-a-post"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;After you have an empty blog its time to add new posts.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Use &lt;code&gt;nikola new_post&lt;/code&gt; command to add a new post to the blog. When creating a jupyter notebook post specify &lt;code&gt;--format=ipynb&lt;/code&gt;. To create a post from existing notebook add option &lt;code&gt;--import=../path/Foo.ipynb&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Create a post with a new empty notebook and edit it later:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;shell.
+ nikola new_post --title="test" --format=ipynb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Create a post with an existing notebook:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;shell.
+ nikola new_post --title="test" --format=ipynb --import=../path/Foo.ipynb&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A new jupyter notebook file &lt;code&gt;posts/test.ipynb&lt;/code&gt; has been created. It will be empty unless your imported existing notebook. Optionally, open it with Jupyter to edit it's content.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Build your blog.
+&lt;pre&gt;&lt;code&gt;nikola build&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To view and render the blog start Nikola by:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;nikola serve --browser
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Alternatively, you can use &lt;code&gt;nikola auto&lt;/code&gt; for build and serve in one command.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;View your blog at &lt;code&gt;localhost:8000&lt;/code&gt;. As changes are saved to the notebooks, the site will automatically rebuild and refresh, but it may take a few seconds.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Press &lt;code&gt;Ctrl+C&lt;/code&gt; to stop the server.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For more information see &lt;a href="https://getnikola.com/getting-started.html"&gt;Nikola's Getting Started&lt;/a&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Delete-or-Update-a-post"&gt;Delete or Update a post&lt;a class="anchor-link" href="https://example.com/posts/test/#Delete-or-Update-a-post"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;To delete a post, delete the post_name.ipynb file inside posts drectory and rebuild.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rm -f posts/test.ipynb.ipynb
+nikola build
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To edit a post you can either:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;edit the file directly with jupyter&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;jupyter notebook posts/test.ipynb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;delete the post and create one with the same title from an existing notebook&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rm -f posts/test.ipynb
+nikola new_post --title&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"test"&lt;/span&gt; --format&lt;span class="o"&gt;=&lt;/span&gt;ipynb --import&lt;span class="o"&gt;=&lt;/span&gt;../path/Foo.ipynb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Deploy"&gt;Deploy&lt;a class="anchor-link" href="https://example.com/posts/test/#Deploy"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Nikola has github_deploy command that will publish to github pages.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nikola github_deploy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The blog should be live online. Go to &lt;a href="https://username.github.io"&gt;https://username.github.io&lt;/a&gt; to confirm it is working.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Customize"&gt;Customize&lt;a class="anchor-link" href="https://example.com/posts/test/#Customize"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;You can customize Nikola when changing the theme, edit conf.py and add extensions.&lt;/p&gt;
+&lt;p&gt;For more information see &lt;a href="https://getnikola.com/documentation.html"&gt;Nikola's documentation&lt;/a&gt; or search for other tutorials.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Alternatives-to-Nikola"&gt;Alternatives to Nikola&lt;a class="anchor-link" href="https://example.com/posts/test/#Alternatives-to-Nikola"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;I choose Nikola for site generator because of its built-in Jupyter Notebook support. There are other alternatives that need workarounds to support notebooks.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Jekyll is the default framework used by github and is probably the most popular framework.&lt;/li&gt;
+&lt;li&gt;Pelican, is another site generator and it is more popular than Nikola.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+</description><guid>https://example.com/posts/test/</guid><pubDate>Sun, 14 Jan 2018 22:38:58 GMT</pubDate></item></channel></rss>

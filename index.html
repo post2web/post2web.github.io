@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article# " lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="This is a demo site for Nikola.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Nikola Site</title>
+<link href="assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<link href="assets/css/ipython.min.css" rel="stylesheet" type="text/css">
+<link href="assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+<link rel="canonical" href="https://example.com/">
+<!--[if lt IE 9]><script src="assets/js/html5.js"></script><![endif]--><link rel="prefetch" href="posts/test/" type="text/html">
+</head>
+<body>
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<!-- Menubar -->
+
+<nav class="navbar navbar-inverse navbar-static-top"><div class="container">
+<!-- This keeps the margins nice -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://example.com/">
+
+                <span id="blog-title">My Nikola Site</span>
+            </a>
+        </div>
+<!-- /.navbar-header -->
+        <div class="collapse navbar-collapse" id="bs-navbar" aria-expanded="false">
+            <ul class="nav navbar-nav">
+<li>
+<a href="archive.html">Archive</a>
+                </li>
+<li>
+<a href="categories/">Tags</a>
+                </li>
+<li>
+<a href="rss.xml">RSS feed</a>
+
+                
+            </li>
+</ul>
+<ul class="nav navbar-nav navbar-right"></ul>
+</div>
+<!-- /.navbar-collapse -->
+    </div>
+<!-- /.container -->
+</nav><!-- End of Menubar --><div class="container" id="content" role="main">
+    <div class="body-content">
+        <!--Body content-->
+        <div class="row">
+            
+            
+
+    
+
+
+    
+<div class="postindex">
+    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/test/" class="u-url">test</a></h1>
+        <div class="metadata">
+            <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
+                Nikola Tesla
+            </span></p>
+            <p class="dateline"><a href="posts/test/" rel="bookmark"><time class="published dt-published" datetime="2018-01-14T14:38:58-08:00" title="2018-01-14 14:38">2018-01-14 14:38</time></a></p>
+        </div>
+    </header><div class="e-content entry-content">
+    <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Jupyter-Blogging-in-5-minutes.">Jupyter Blogging in 5 minutes.<a class="anchor-link" href="posts/test/#Jupyter-Blogging-in-5-minutes.">¶</a>
+</h2>
+<p>Q: What is Jupyter Blogging?<br>
+A: Blogging with jupyter notebooks.</p>
+<p>Q: Why Jupyter Blogging?<br>
+A: As a Data Scientists, I use jupyter to create notebooks with code, equations, visualizations, documentation, etc. "Jupyter Blogging" allows me to share those notebooks with the world without any additional work.</p>
+<p>Q: How is this achieved?<br>
+A: <a href="http://jupyter.org">Jupyter Notebook</a> + 
+<a href="https://pages.github.com">Github Pages</a> + 
+<a href="https://getnikola.com">Nikola</a> = Jupyter Blogging.</p>
+<p>This tutorial will give you basic instructions for setting up a minimum blog powered by jupyter notebooks. This tutorial is written on a jupyter notebook.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Github-Pages-initial-setup">Github Pages initial setup<a class="anchor-link" href="posts/test/#Github-Pages-initial-setup">¶</a>
+</h3>
+<p>Github Pages will do the hosting in addition to versioning of your blog.</p>
+<ol>
+<li>Create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</li>
+<li>Clone it as so:
+<pre><code>`shell
+git clone https://github.com/username/username.github.io
+cd username.github.io</code></pre>
+In addition, any project you have on github that has a <code>gh-pages</code> branch can be accessed via 
+<pre><code>username.github.io/your-project</code></pre>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Nikola-setup">Nikola setup<a class="anchor-link" href="posts/test/#Nikola-setup">¶</a>
+</h3>
+<p>Nikola will render all the HTML from the notebooks in a way that creates a blog structure.</p>
+<ol>
+<li>Install Nikola with pip:<div class="highlight"><pre><span></span>pip install <span class="s2">"Nikola[extras]"</span>
+</pre></div>
+</li>
+<li>Create Nikola project (inside website root directory):<div class="highlight"><pre><span></span>nikola init .
+</pre></div>
+</li>
+<li>In order to use Jupyter notebooks, we need to edit the conf.py file that was just generated. Scroll down until you see POSTS and PAGES declaration and add .ipynb files lines.<pre>
+POSTS = (
+ <b>("posts/*.ipynb", "posts", "post.tmpl"), # -- add this line</b>
+ ("posts/*.rst", "posts", "post.tmpl"),
+ ("posts/*.md", "posts", "post.tmpl"),
+ ("posts/*.txt", "posts", "post.tmpl"),
+ ("posts/*.html", "posts", "post.tmpl"),
+)
+PAGES = (
+ <b>("pages/*.ipynb", "pages", "page.tmpl"), # -- add this line</b>
+ ("pages/*.rst", "pages", "page.tmpl"),
+ ("pages/*.md", "pages", "page.tmpl"),
+ ("pages/*.txt", "pages", "page.tmpl"),
+ ("pages/*.html", "pages", "page.tmpl"),
+)
+</pre>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Create-a-post">Create a post<a class="anchor-link" href="posts/test/#Create-a-post">¶</a>
+</h3>
+<p>After you have an empty blog its time to add new posts.</p>
+<ol>
+<li>
+<p>Use <code>nikola new_post</code> command to add a new post to the blog. When creating a jupyter notebook post specify <code>--format=ipynb</code>. To create a post from existing notebook add option <code>--import=../path/Foo.ipynb</code></p>
+<p>Create a post with a new empty notebook and edit it later:</p>
+
+<pre><code>shell.
+ nikola new_post --title="test" --format=ipynb</code></pre>
+<p>Create a post with an existing notebook:</p>
+
+<pre><code>shell.
+ nikola new_post --title="test" --format=ipynb --import=../path/Foo.ipynb</code></pre>
+</li>
+<li>
+<p>A new jupyter notebook file <code>posts/test.ipynb</code> has been created. It will be empty unless your imported existing notebook. Optionally, open it with Jupyter to edit it's content.</p>
+</li>
+<li>Build your blog.
+<pre><code>nikola build</code></pre>
+</li>
+<li>
+<p>To view and render the blog start Nikola by:</p>
+<div class="highlight"><pre><span></span>nikola serve --browser
+</pre></div>
+<p>Alternatively, you can use <code>nikola auto</code> for build and serve in one command.</p>
+</li>
+<li>
+<p>View your blog at <code>localhost:8000</code>. As changes are saved to the notebooks, the site will automatically rebuild and refresh, but it may take a few seconds.</p>
+</li>
+<li>Press <code>Ctrl+C</code> to stop the server.</li>
+</ol>
+<p>For more information see <a href="https://getnikola.com/getting-started.html">Nikola's Getting Started</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Delete-or-Update-a-post">Delete or Update a post<a class="anchor-link" href="posts/test/#Delete-or-Update-a-post">¶</a>
+</h3>
+<ul>
+<li>
+<p>To delete a post, delete the post_name.ipynb file inside posts drectory and rebuild.</p>
+<div class="highlight"><pre><span></span>rm -f posts/test.ipynb.ipynb
+nikola build
+</pre></div>
+</li>
+<li>
+<p>To edit a post you can either:</p>
+<ul>
+<li>edit the file directly with jupyter<div class="highlight"><pre><span></span>jupyter notebook posts/test.ipynb
+</pre></div>
+</li>
+<li>
+<p>delete the post and create one with the same title from an existing notebook</p>
+<div class="highlight"><pre><span></span>rm -f posts/test.ipynb
+nikola new_post --title<span class="o">=</span><span class="s2">"test"</span> --format<span class="o">=</span>ipynb --import<span class="o">=</span>../path/Foo.ipynb
+</pre></div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Deploy">Deploy<a class="anchor-link" href="posts/test/#Deploy">¶</a>
+</h3>
+<p>Nikola has github_deploy command that will publish to github pages.</p>
+
+<pre><code>nikola github_deploy</code></pre>
+<p>The blog should be live online. Go to <a href="https://username.github.io">https://username.github.io</a> to confirm it is working.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Customize">Customize<a class="anchor-link" href="posts/test/#Customize">¶</a>
+</h3>
+<p>You can customize Nikola when changing the theme, edit conf.py and add extensions.</p>
+<p>For more information see <a href="https://getnikola.com/documentation.html">Nikola's documentation</a> or search for other tutorials.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Alternatives-to-Nikola">Alternatives to Nikola<a class="anchor-link" href="posts/test/#Alternatives-to-Nikola">¶</a>
+</h3>
+<p>I choose Nikola for site generator because of its built-in Jupyter Notebook support. There are other alternatives that need workarounds to support notebooks.</p>
+<ul>
+<li>Jekyll is the default framework used by github and is probably the most popular framework.</li>
+<li>Pelican, is another site generator and it is more popular than Nikola.</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+
+    </div>
+    </article>
+</div>
+
+
+
+
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-SDRP1VVYu+tgAGKhddBSl5+ezofHKZeI+OzxakbIe/Y=" crossorigin="anonymous"></script><script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$latex ','$'], ['\\(','\\)']]}});
+        </script>
+</div>
+        <!--End of body content-->
+
+        <footer id="footer">
+            Contents © 2018         <a href="mailto:n.tesla@example.com">Nikola Tesla</a> - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         
+            
+        </footer>
+</div>
+</div>
+
+
+            <script src="assets/js/all-nocdn.js"></script><script>$('a.image-reference:not(.islink) img:not(.islink)').parent().colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script><!-- fancy dates --><script>
+    moment.locale("en");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script><!-- end fancy dates -->
+</body>
+</html>
