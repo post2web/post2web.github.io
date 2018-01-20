@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="description" content="This is my data science blog.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evo's TL; DR Data Science Blog (page 1) | Evo's TL; DR Data Science Blog</title>
+<title>Ivelin's TL;DR Data Science Blog (page 1) | Ivelin's TL;DR Data Science Blog</title>
 <link href="assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
 <link href="assets/css/ipython.min.css" rel="stylesheet" type="text/css">
 <link href="assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
@@ -13,7 +13,7 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
 <link rel="canonical" href="https://post2web.github.io/">
 <!--[if lt IE 9]><script src="assets/js/html5.js"></script><![endif]--><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-<link rel="prefetch" href="posts/embeddings-with-tensorflow/" type="text/html">
+<link rel="prefetch" href="posts/word2vec-with-tensorflow/" type="text/html">
 </head>
 <body>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
@@ -31,7 +31,7 @@
             </button>
             <a class="navbar-brand" href="https://post2web.github.io/">
 
-                <span id="blog-title">Evo's TL; DR Data Science Blog</span>
+                <span id="blog-title">Ivelin's TL;DR Data Science Blog</span>
             </a>
         </div>
 <!-- /.navbar-header -->
@@ -66,7 +66,52 @@
 
     
 <div class="postindex">
-    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/embeddings-with-tensorflow/" class="u-url">Embeddings with TensorFlow</a></h1>
+    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/word2vec-with-tensorflow/" class="u-url">Word2Vec with TensorFlow</a></h1>
+        <div class="metadata">
+            <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
+                Ivelin Angelov
+            </span></p>
+            <p class="dateline"><a href="posts/word2vec-with-tensorflow/" rel="bookmark"><time class="published dt-published" datetime="2018-01-20T13:00:07-08:00" title="2018-01-20 13:00">2018-01-20 13:00</time></a></p>
+                <p class="commentline">
+        
+    <a href="posts/word2vec-with-tensorflow/#disqus_thread" data-disqus-identifier="cache/posts/word2vec-with-tensorflow.html">Comments</a>
+
+
+        </p>
+</div>
+    </header><div class="p-summary entry-summary">
+    <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Word2Vec-with-Skip-Gram-and-TensorFlow">Word2Vec with Skip-Gram and TensorFlow<a class="anchor-link" href="posts/word2vec-with-tensorflow/#Word2Vec-with-Skip-Gram-and-TensorFlow">¶</a>
+</h2>
+<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings read my previous post.</p>
+<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representation:">The word2vec model can be trained with two different word representation:<a class="anchor-link" href="posts/word2vec-with-tensorflow/#The-word2vec-model-can-be-trained-with-two-different-word-representation:">¶</a>
+</h4>
+<ul>
+<li>
+<b>Continuous Bag-of-Words (CBOW)</b>: predicts target words (e.g. 'mat') from source context words ('the cat sits on the')</li>
+<li>
+<b>Skip-Gram</b>: predicts source context-words from the target words</li>
+</ul>
+<h4 id="Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">Skip-Gram tends to do better and this tutorial will implement a word2vec with skip-grams.<a class="anchor-link" href="posts/word2vec-with-tensorflow/#Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">¶</a>
+</h4>
+<p>The goal of the model is to train it embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors:</p>
+<h5 id="[king]---[man]-+-[woman]-~=-[queen]">[king] - [man] + [woman] ~= [queen]<a class="anchor-link" href="posts/word2vec-with-tensorflow/#%5Bking%5D---%5Bman%5D-+-%5Bwoman%5D-~=-%5Bqueen%5D">¶</a>
+</h5>
+<p class="more"><a href="posts/word2vec-with-tensorflow/">Read more…</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    </article><article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/embeddings-with-tensorflow/" class="u-url">Embeddings with TensorFlow</a></h1>
         <div class="metadata">
             <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
                 Ivelin Angelov
