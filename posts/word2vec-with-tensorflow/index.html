@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article# " lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word2Vec with TensorFlow | Ivelin's TL;DR Data Science Blog</title>
+<link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/ipython.min.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="../../rss.xml">
+<link rel="canonical" href="https://post2web.github.io/posts/word2vec-with-tensorflow/">
+<!--[if lt IE 9]><script src="../../assets/js/html5.js"></script><![endif]--><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+<meta name="author" content="Ivelin Angelov">
+<link rel="prev" href="../embeddings-with-tensorflow/" title="Embeddings with TensorFlow" type="text/html">
+<meta property="og:site_name" content="Ivelin's TL;DR Data Science Blog">
+<meta property="og:title" content="Word2Vec with TensorFlow">
+<meta property="og:url" content="https://post2web.github.io/posts/word2vec-with-tensorflow/">
+<meta property="og:description" content="Word2Vec with Skip-Gram and TensorFlow¶This is a tutorial and a basic example for getting started with word2vec model by Mikolov et al. It is used for learning vector representations of words, called ">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2018-01-20T13:00:07-08:00">
+</head>
+<body>
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<!-- Menubar -->
+
+<nav class="navbar navbar-inverse navbar-static-top"><div class="container">
+<!-- This keeps the margins nice -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://post2web.github.io/">
+
+                <span id="blog-title">Ivelin's TL;DR Data Science Blog</span>
+            </a>
+        </div>
+<!-- /.navbar-header -->
+        <div class="collapse navbar-collapse" id="bs-navbar" aria-expanded="false">
+            <ul class="nav navbar-nav">
+<li>
+<a href="../../">Blog</a>
+                </li>
+<li>
+<a href="../../archive.html">Archive</a>
+                </li>
+<li>
+<a href="../../rss.xml">RSS feed</a>
+
+                
+            </li>
+</ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+    <a href="index.ipynb" id="sourcelink">Source</a>
+    </li>
+
+                
+            </ul>
+</div>
+<!-- /.navbar-collapse -->
+    </div>
+<!-- /.container -->
+</nav><!-- End of Menubar --><div class="container" id="content" role="main">
+    <div class="body-content">
+        <!--Body content-->
+        <div class="row">
+            
+            
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url">Word2Vec with TensorFlow</a></h1>
+
+        <div class="metadata">
+            <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
+                    Ivelin Angelov
+            </span></p>
+            <p class="dateline"><a href="." rel="bookmark"><time class="published dt-published" datetime="2018-01-20T13:00:07-08:00" itemprop="datePublished" title="2018-01-20 13:00">2018-01-20 13:00</time></a></p>
+                <p class="commentline">
+        
+    <a href="#disqus_thread" data-disqus-identifier="cache/posts/word2vec-with-tensorflow.html">Comments</a>
+
+
+            
+        </p>
+<p class="sourceline"><a href="index.ipynb" class="sourcelink">Source</a></p>
+
+        </div>
+        
+
+    </header><div class="e-content entry-content" itemprop="articleBody text">
+    <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Word2Vec-with-Skip-Gram-and-TensorFlow">Word2Vec with Skip-Gram and TensorFlow<a class="anchor-link" href="#Word2Vec-with-Skip-Gram-and-TensorFlow">¶</a>
+</h2>
+<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings read my previous post.</p>
+<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representation:">The word2vec model can be trained with two different word representation:<a class="anchor-link" href="#The-word2vec-model-can-be-trained-with-two-different-word-representation:">¶</a>
+</h4>
+<ul>
+<li>
+<b>Continuous Bag-of-Words (CBOW)</b>: predicts target words (e.g. 'mat') from source context words ('the cat sits on the')</li>
+<li>
+<b>Skip-Gram</b>: predicts source context-words from the target words</li>
+</ul>
+<h4 id="Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">Skip-Gram tends to do better and this tutorial will implement a word2vec with skip-grams.<a class="anchor-link" href="#Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">¶</a>
+</h4>
+<p>The goal of the model is to train it embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors:</p>
+<h5 id="[king]---[man]-+-[woman]-~=-[queen]">[king] - [man] + [woman] ~= [queen]<a class="anchor-link" href="#%5Bking%5D---%5Bman%5D-+-%5Bwoman%5D-~=-%5Bqueen%5D">¶</a>
+</h5>
+<!-- TEASER_END -->
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">env</span> CUDA_VISIBLE_DEVICES=0
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>env: CUDA_VISIBLE_DEVICES=0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Dataset">Dataset<a class="anchor-link" href="#Dataset">¶</a>
+</h2>
+<p>To train a word2vec model we need a large text corpus. This example uses text from the "20 newsgroups dataset". The dataset contains 11314 messages form a message board with corresponding labels for its topic. We just merge all messages together and ignore the labels. In practice, it's better to use a larger corpus and to have a domain-specific text. Lowering the case of the text is optional and will small corpus will be better ot have it lowered.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">fetch_20newsgroups</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">fetch_20newsgroups</span><span class="p">()</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="n">text</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">350</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[2]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>'umd.edu\norganization: university of maryland, college park\nlines: 15\n\n i was wondering if anyone out there could enlighten me on this car i saw\nthe other day. it was a 2-door sports car, looked to be from the late 60s/\nearly 70s. it was called a bric'</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Sentence-Tokenize">Sentence Tokenize<a class="anchor-link" href="#Sentence-Tokenize">¶</a>
+</h2>
+<p>The skip grams will work better if they are created from sentenced text. <code>nltk.sent_tokenize</code> will break a string to a list of sentences.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sentences_text</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">sent_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">sentences_text</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[3]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>173268</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Word-Tokenize">Word Tokenize<a class="anchor-link" href="#Word-Tokenize">¶</a>
+</h2>
+<p>Next, break all sentences to tokens (words) with <code>nltk.word_tokenize</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences_text</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sentences</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>['please', 'send', 'a', 'brief', 'message', 'detailing', 'your', 'experiences', 'with', 'the', 'procedure', '.']
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Vocabulary-(unique-words)">Vocabulary (unique words)<a class="anchor-link" href="#Vocabulary-(unique-words)">¶</a>
+</h2>
+<p>In this example, we filter words who are used less than 5 times in the text, stop words and punctuations.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span>  <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="k">import</span> <span class="n">punctuation</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="k">import</span> <span class="n">stopwords</span>
+
+<span class="n">min_count</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">puncs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">punctuation</span><span class="p">)</span>
+<span class="n">stops</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">'english'</span><span class="p">))</span>
+
+<span class="n">flat_words</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+    <span class="n">flat_words</span> <span class="o">+=</span> <span class="n">sentence</span>
+    
+<span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">flat_words</span><span class="p">))</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">())</span>
+<span class="n">counts</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'word'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">]</span>
+
+<span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">counts</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_count</span><span class="p">]</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="o">~</span><span class="n">counts</span><span class="p">[</span><span class="s1">'word'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">puncs</span><span class="p">)]</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="o">~</span><span class="n">counts</span><span class="p">[</span><span class="s1">'word'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">stops</span><span class="p">)]</span>
+
+
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">counts</span><span class="p">[</span><span class="s1">'word'</span><span class="p">])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'The vocabulary has:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span> <span class="s1">'words'</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The vocabulary has: 34016 words
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Filter-tokens-not-in-vocabulary">Filter tokens not in vocabulary<a class="anchor-link" href="#Filter-tokens-not-in-vocabulary">¶</a>
+</h2>
+<p>Some words were excluded from the vocabulary because they are very rare or too common to present value. We have to remove them from our sentences.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">filtered_sentences</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+    <span class="n">sentence</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+        <span class="n">filtered_sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="n">filtered_sentences</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Transform-the-words-to-integer-indexes">Transform the words to integer indexes<a class="anchor-link" href="#Transform-the-words-to-integer-indexes">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
+    <span class="n">sentences</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">vocab</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Create-Skip-Gram-dataset">Create Skip-Gram dataset<a class="anchor-link" href="#Create-Skip-Gram-dataset">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nltk.util</span> <span class="k">import</span> <span class="n">skipgrams</span>
+
+<span class="n">window_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sentance</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">+=</span> <span class="n">skipgrams</span><span class="p">(</span><span class="n">sentance</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">window_size</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">])</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[8]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead><tr style="text-align: right;">
+<th></th>
+      <th>x</th>
+      <th>y</th>
+    </tr></thead>
+<tbody>
+<tr>
+<th>0</th>
+      <td>5816</td>
+      <td>4</td>
+    </tr>
+<tr>
+<th>1</th>
+      <td>5816</td>
+      <td>122</td>
+    </tr>
+<tr>
+<th>2</th>
+      <td>5816</td>
+      <td>6</td>
+    </tr>
+<tr>
+<th>3</th>
+      <td>5816</td>
+      <td>159</td>
+    </tr>
+<tr>
+<th>4</th>
+      <td>4</td>
+      <td>122</td>
+    </tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Train-and-Validation-Split">Train and Validation Split<a class="anchor-link" href="#Train-and-Validation-Split">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">validation_size</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="n">data_valid</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="n">validation_size</span><span class="p">:]</span>
+<span class="n">data_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="n">validation_size</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Train size:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_train</span><span class="p">),</span> <span class="s1">'Validation size:'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_valid</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Train size: 14098409 Validation size: 5000
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Model-Hyperparameters">Model Hyperparameters<a class="anchor-link" href="#Model-Hyperparameters">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span>
+<span class="n">embed_size</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">1000000</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Model-Inputs">Model Inputs<a class="anchor-link" href="#Model-Inputs">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Embeddings-Layer">Embeddings Layer<a class="anchor-link" href="#Embeddings-Layer">¶</a>
+</h2>
+<p>This is the embeddings layer. Its a len(vocab) by embed_size matrix, initialized with random uniform distribution. The optimizer will change the similarity between it's rows to be higher on similar words.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_uniform</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span> <span class="n">embed_size</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Linear-layer">Linear layer<a class="anchor-link" href="#Linear-layer">¶</a>
+</h2>
+<p>We use a linear layer with <code>activation=None</code>. We don't need this layer after the training. Think of it as part of the loss function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">logits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">embed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Loss-&amp;-Optimization">Loss &amp; Optimization<a class="anchor-link" href="#Loss-&amp;-Optimization">¶</a>
+</h2>
+<p>There is a more optimized, noise-contrastive loss function for traning word embeddings: <code>tf.nn.nce_loss</code>. I use <code>tf.nn.softmax_cross_entropy_with_logits</code> for simplicity. For more information about the nce_loss look at the <a href="https://www.tensorflow.org/tutorials/word2vec">TensorFlow word2vec tutorial</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">))</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="n">train_op</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Start-Session">Start Session<a class="anchor-link" href="#Start-Session">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-Loop">Training Loop<a class="anchor-link" href="#Training-Loop">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">cosine_similarity</span>
+
+<span class="k">def</span> <span class="nf">get_batches</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c1"># cheap way to add some randomization</span>
+        <span class="n">rand_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">batch_size</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">rand_start</span><span class="p">:]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">rand_start</span><span class="p">:]</span>
+
+    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))[::</span><span class="n">batch_size</span><span class="p">][:</span><span class="n">n</span><span class="p">]:</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span>
+        <span class="k">yield</span> <span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
+<span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">step</span> <span class="o">&lt;</span> <span class="n">steps</span><span class="p">:</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    <span class="c1"># shuffle train data once in while</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">data_train</span> <span class="o">=</span> <span class="n">data_train</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+    
+    <span class="c1"># train part</span>
+    <span class="n">train_loss</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">get_batches</span><span class="p">(</span>
+        <span class="n">data_train</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">data_train</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">train_op</span><span class="p">,</span> <span class="n">loss</span><span class="p">],</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+        <span class="n">train_loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_loss</span><span class="p">)</span>
+
+    <span class="c1"># validation prat (one batch of "validation_size")</span>
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">data_valid</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">data_valid</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+    <span class="n">valid_loss</span><span class="p">,</span> <span class="n">x_vectors</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">loss</span><span class="p">,</span> <span class="n">embed</span><span class="p">],</span> <span class="n">feed_dict</span><span class="p">)</span>
+    <span class="n">y_vectors</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embed</span><span class="p">,</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">data_valid</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">})</span>
+
+    <span class="c1"># outputs</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Step:'</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="s1">'TLoss:'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_loss</span><span class="p">),</span> <span class="s1">'VLoss:'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">valid_loss</span><span class="p">),</span>
+          <span class="s1">'Similarity: </span><span class="si">%.3f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">x_vectors</span><span class="p">,</span> <span class="n">y_vectors</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+          <span class="s1">'Seconds </span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Step: 10000 TLoss: 2.0164194 VLoss: 0.5388802 Similarity: 0.023 Seconds 66.5
+Step: 20000 TLoss: 0.12752666 VLoss: 0.11306174 Similarity: 0.023 Seconds 65.2
+Step: 30000 TLoss: 0.028313937 VLoss: 0.11745877 Similarity: 0.023 Seconds 65.5
+Step: 40000 TLoss: 0.010771247 VLoss: 0.012606331 Similarity: 0.024 Seconds 65.8
+Step: 50000 TLoss: 0.0013680928 VLoss: 0.012557062 Similarity: 0.024 Seconds 65.9
+Step: 60000 TLoss: 0.0041248337 VLoss: 7.6293943e-10 Similarity: 0.025 Seconds 65.8
+Step: 70000 TLoss: 0.0014730034 VLoss: 1.0251998e-09 Similarity: 0.026 Seconds 65.9
+Step: 80000 TLoss: 0.00054400414 VLoss: 6.67572e-10 Similarity: 0.027 Seconds 65.9
+Step: 90000 TLoss: 0.0005858248 VLoss: 1.3113021e-09 Similarity: 0.027 Seconds 65.9
+Step: 100000 TLoss: 0.0009175814 VLoss: 8.1062307e-10 Similarity: 0.028 Seconds 65.9
+Step: 110000 TLoss: 0.00022360244 VLoss: 9.059905e-10 Similarity: 0.029 Seconds 66.9
+Step: 120000 TLoss: 6.2553576e-05 VLoss: 6.4373007e-10 Similarity: 0.030 Seconds 65.8
+Step: 130000 TLoss: 0.00019555185 VLoss: 2.4318687e-09 Similarity: 0.030 Seconds 65.8
+Step: 140000 TLoss: 5.0704068e-05 VLoss: 9.775161e-10 Similarity: 0.031 Seconds 65.8
+Step: 150000 TLoss: 0.00014003972 VLoss: 1.0251997e-09 Similarity: 0.032 Seconds 65.9
+Step: 160000 TLoss: 7.326659e-05 VLoss: 1.2636184e-09 Similarity: 0.033 Seconds 65.9
+Step: 170000 TLoss: 0.00014974378 VLoss: 9.775161e-10 Similarity: 0.033 Seconds 65.8
+Step: 180000 TLoss: 1.296028e-09 VLoss: 1.7404554e-09 Similarity: 0.034 Seconds 65.8
+Step: 190000 TLoss: 9.8594224e-05 VLoss: 8.583068e-10 Similarity: 0.035 Seconds 65.8
+Step: 200000 TLoss: 5.5742334e-05 VLoss: 1.3113021e-09 Similarity: 0.036 Seconds 65.8
+Step: 210000 TLoss: 1.2936069e-09 VLoss: 9.536743e-10 Similarity: 0.037 Seconds 66.9
+Step: 220000 TLoss: 1.3055278e-09 VLoss: 1.4066694e-09 Similarity: 0.037 Seconds 65.8
+Step: 230000 TLoss: 0.0001788908 VLoss: 1.0490416e-09 Similarity: 0.038 Seconds 65.8
+Step: 240000 TLoss: 5.5293618e-05 VLoss: 2.4795528e-09 Similarity: 0.039 Seconds 65.7
+Step: 250000 TLoss: 1.3612207e-09 VLoss: 1.5735624e-09 Similarity: 0.040 Seconds 65.8
+Step: 260000 TLoss: 1.3375653e-09 VLoss: 1.0728836e-09 Similarity: 0.041 Seconds 65.8
+Step: 270000 TLoss: 1.3418494e-09 VLoss: 1.5258788e-09 Similarity: 0.042 Seconds 65.8
+Step: 280000 TLoss: 1.3548879e-09 VLoss: 1.001358e-09 Similarity: 0.043 Seconds 65.7
+Step: 290000 TLoss: 1.3586132e-09 VLoss: 1.2159346e-09 Similarity: 0.045 Seconds 65.8
+Step: 300000 TLoss: 0.0001109721 VLoss: 9.298324e-10 Similarity: 0.046 Seconds 65.8
+Step: 310000 TLoss: 1.3770534e-09 VLoss: 7.867812e-10 Similarity: 0.047 Seconds 66.9
+Step: 320000 TLoss: 1.3697891e-09 VLoss: 8.1062307e-10 Similarity: 0.048 Seconds 65.7
+Step: 330000 TLoss: 1.3677401e-09 VLoss: 8.8214863e-10 Similarity: 0.050 Seconds 65.8
+Step: 340000 TLoss: 1.3770534e-09 VLoss: 1.0490416e-09 Similarity: 0.051 Seconds 65.7
+Step: 350000 TLoss: 1.3750044e-09 VLoss: 9.775161e-10 Similarity: 0.052 Seconds 65.8
+Step: 360000 TLoss: 1.3889743e-09 VLoss: 1.2159347e-09 Similarity: 0.054 Seconds 65.8
+Step: 370000 TLoss: 1.3785435e-09 VLoss: 9.298324e-10 Similarity: 0.055 Seconds 65.8
+Step: 380000 TLoss: 1.3930721e-09 VLoss: 9.536743e-10 Similarity: 0.057 Seconds 65.8
+Step: 390000 TLoss: 1.3809649e-09 VLoss: 1.2397765e-09 Similarity: 0.059 Seconds 65.8
+Step: 400000 TLoss: 1.3953073e-09 VLoss: 1.1205672e-09 Similarity: 0.060 Seconds 65.8
+Step: 410000 TLoss: 1.3913958e-09 VLoss: 1.3589857e-09 Similarity: 0.062 Seconds 67.0
+Step: 420000 TLoss: 1.4010815e-09 VLoss: 1.4066694e-09 Similarity: 0.064 Seconds 65.7
+Step: 430000 TLoss: 1.400709e-09 VLoss: 1.2874601e-09 Similarity: 0.066 Seconds 65.8
+Step: 440000 TLoss: 1.4089047e-09 VLoss: 1.5258788e-09 Similarity: 0.068 Seconds 65.8
+Step: 450000 TLoss: 1.407787e-09 VLoss: 1.9550321e-09 Similarity: 0.070 Seconds 65.8
+Step: 460000 TLoss: 1.4074145e-09 VLoss: 1.2159347e-09 Similarity: 0.072 Seconds 65.8
+Step: 470000 TLoss: 1.4100222e-09 VLoss: 1.2397764e-09 Similarity: 0.074 Seconds 65.9
+Step: 480000 TLoss: 1.4215706e-09 VLoss: 9.536743e-10 Similarity: 0.076 Seconds 65.8
+Step: 490000 TLoss: 1.4159827e-09 VLoss: 9.298324e-10 Similarity: 0.079 Seconds 65.8
+Step: 500000 TLoss: 1.416169e-09 VLoss: 9.298324e-10 Similarity: 0.081 Seconds 65.8
+Step: 510000 TLoss: 1.4213843e-09 VLoss: 9.298324e-10 Similarity: 0.083 Seconds 66.9
+Step: 520000 TLoss: 1.4251096e-09 VLoss: 1.0967254e-09 Similarity: 0.086 Seconds 65.8
+Step: 530000 TLoss: 1.4256684e-09 VLoss: 1.0251998e-09 Similarity: 0.089 Seconds 65.8
+Step: 540000 TLoss: 1.4100222e-09 VLoss: 9.536743e-10 Similarity: 0.092 Seconds 65.8
+Step: 550000 TLoss: 6.02954e-05 VLoss: 1.3828276e-09 Similarity: 0.095 Seconds 65.8
+Step: 560000 TLoss: 1.4210118e-09 VLoss: 9.298324e-10 Similarity: 0.097 Seconds 65.8
+Step: 570000 TLoss: 1.4185904e-09 VLoss: 1.0967254e-09 Similarity: 0.100 Seconds 65.8
+Step: 580000 TLoss: 1.4187767e-09 VLoss: 1.7404554e-09 Similarity: 0.104 Seconds 65.9
+Step: 590000 TLoss: 1.4262272e-09 VLoss: 1.1444091e-09 Similarity: 0.107 Seconds 65.8
+Step: 600000 TLoss: 1.4228745e-09 VLoss: 1.0728836e-09 Similarity: 0.110 Seconds 65.7
+Step: 610000 TLoss: 1.4236196e-09 VLoss: 1.0967254e-09 Similarity: 0.113 Seconds 66.9
+Step: 620000 TLoss: 1.4243645e-09 VLoss: 1.1920928e-09 Similarity: 0.117 Seconds 65.8
+Step: 630000 TLoss: 1.4230607e-09 VLoss: 1.5258789e-09 Similarity: 0.120 Seconds 65.9
+Step: 640000 TLoss: 1.4180316e-09 VLoss: 1.0490416e-09 Similarity: 0.124 Seconds 65.8
+Step: 650000 TLoss: 1.4292074e-09 VLoss: 1.2159346e-09 Similarity: 0.127 Seconds 65.7
+Step: 660000 TLoss: 1.4111398e-09 VLoss: 1.2874602e-09 Similarity: 0.131 Seconds 65.9
+Step: 670000 TLoss: 1.4150513e-09 VLoss: 1.0251998e-09 Similarity: 0.135 Seconds 65.8
+Step: 680000 TLoss: 1.4187767e-09 VLoss: 1.2397764e-09 Similarity: 0.138 Seconds 65.8
+Step: 690000 TLoss: 1.4150513e-09 VLoss: 1.5735624e-09 Similarity: 0.142 Seconds 65.8
+Step: 700000 TLoss: 1.4124436e-09 VLoss: 1.2397764e-09 Similarity: 0.146 Seconds 65.8
+Step: 710000 TLoss: 1.4159827e-09 VLoss: 6.437301e-10 Similarity: 0.189 Seconds 66.9
+Step: 720000 TLoss: 1.5705822e-09 VLoss: 1.3589857e-09 Similarity: 0.246 Seconds 65.7
+Step: 730000 TLoss: 1.493655e-09 VLoss: 1.9073485e-09 Similarity: 0.250 Seconds 65.8
+Step: 740000 TLoss: 1.474656e-09 VLoss: 1.3351439e-09 Similarity: 0.254 Seconds 65.8
+Step: 750000 TLoss: 1.4690681e-09 VLoss: 1.9073485e-09 Similarity: 0.258 Seconds 65.7
+Step: 760000 TLoss: 1.4789401e-09 VLoss: 1.1205672e-09 Similarity: 0.262 Seconds 65.7
+Step: 770000 TLoss: 1.462735e-09 VLoss: 1.4066696e-09 Similarity: 0.266 Seconds 65.7
+Step: 780000 TLoss: 0.00051325257 VLoss: 4.7683715e-11 Similarity: 0.209 Seconds 65.8
+Step: 790000 TLoss: 2.8088684e-10 VLoss: 1.9073486e-10 Similarity: 0.212 Seconds 65.7
+Step: 800000 TLoss: 3.341585e-10 VLoss: 2.3841856e-10 Similarity: 0.214 Seconds 65.8
+Step: 810000 TLoss: 3.8016584e-10 VLoss: 6.67572e-10 Similarity: 0.216 Seconds 66.8
+Step: 820000 TLoss: 4.0736045e-10 VLoss: 5.245208e-10 Similarity: 0.217 Seconds 65.7
+Step: 830000 TLoss: 4.308298e-10 VLoss: 3.814697e-10 Similarity: 0.219 Seconds 65.7
+Step: 840000 TLoss: 4.3716278e-10 VLoss: 3.5762784e-10 Similarity: 0.220 Seconds 65.7
+Step: 850000 TLoss: 4.4349577e-10 VLoss: 7.390975e-10 Similarity: 0.221 Seconds 65.7
+Step: 860000 TLoss: 4.5541665e-10 VLoss: 3.8146972e-10 Similarity: 0.223 Seconds 65.8
+Step: 870000 TLoss: 4.706904e-10 VLoss: 4.291534e-10 Similarity: 0.224 Seconds 65.7
+Step: 880000 TLoss: 4.716217e-10 VLoss: 4.768371e-10 Similarity: 0.225 Seconds 65.7
+Step: 890000 TLoss: 4.7758214e-10 VLoss: 7.3909756e-10 Similarity: 0.227 Seconds 65.8
+Step: 900000 TLoss: 4.872679e-10 VLoss: 5.245208e-10 Similarity: 0.228 Seconds 65.7
+Step: 910000 TLoss: 4.8801296e-10 VLoss: 4.5299525e-10 Similarity: 0.229 Seconds 66.8
+Step: 920000 TLoss: 5.003064e-10 VLoss: 7.629394e-10 Similarity: 0.230 Seconds 65.7
+Step: 930000 TLoss: 5.122273e-10 VLoss: 5.00679e-10 Similarity: 0.232 Seconds 65.7
+Step: 940000 TLoss: 5.0999216e-10 VLoss: 3.33786e-10 Similarity: 0.233 Seconds 65.7
+Step: 950000 TLoss: 5.222856e-10 VLoss: 2.8610228e-10 Similarity: 0.234 Seconds 65.8
+Step: 960000 TLoss: 5.30295e-10 VLoss: 6.1988825e-10 Similarity: 0.235 Seconds 65.8
+Step: 970000 TLoss: 5.427747e-10 VLoss: 6.1988825e-10 Similarity: 0.236 Seconds 65.7
+Step: 980000 TLoss: 5.3048127e-10 VLoss: 5.245208e-10 Similarity: 0.237 Seconds 65.8
+Step: 990000 TLoss: 5.479901e-10 VLoss: 5.483627e-10 Similarity: 0.238 Seconds 65.7
+Step: 1000000 TLoss: 5.507841e-10 VLoss: 4.5299525e-10 Similarity: 0.239 Seconds 65.7
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="We-have-trained-embeddings!">We have trained embeddings!<a class="anchor-link" href="#We-have-trained-embeddings!">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vectors</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span>
+<span class="n">vectors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">vectors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">vocab</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Demonstrate-similarity">Demonstrate similarity<a class="anchor-link" href="#Demonstrate-similarity">¶</a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">cosine_similarity</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Similarity:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'   computer to mouse ='</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'computer'</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'mouse'</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'   cat to mouse ='</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'cat'</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'mouse'</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'   dog to mouse ='</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'dog'</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">'mouse'</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Similarity:
+   computer to mouse = 0.05870525
+   cat to mouse = 0.052366085
+   dog to mouse = -0.009641118
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">References<a class="anchor-link" href="#References">¶</a>
+</h2>
+<ul>
+<li><a href="https://www.tensorflow.org/tutorials/word2vec">https://www.tensorflow.org/tutorials/word2vec</a></li>
+<li><a href="http://adventuresinmachinelearning.com/word2vec-tutorial-tensorflow/">http://adventuresinmachinelearning.com/word2vec-tutorial-tensorflow/</a></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+
+    </div>
+    <aside class="postpromonav"><nav><ul class="pager hidden-print">
+<li class="previous">
+                <a href="../embeddings-with-tensorflow/" rel="prev" title="Embeddings with TensorFlow">Previous post</a>
+            </li>
+        </ul></nav></aside><section class="comments hidden-print"><h2>Comments</h2>
+        
+        
+        <div id="disqus_thread"></div>
+        <script>
+        var disqus_shortname ="post2web-github-io",
+            disqus_url="https://post2web.github.io/posts/word2vec-with-tensorflow/",
+        disqus_title="Word2Vec with TensorFlow",
+        disqus_identifier="cache/posts/word2vec-with-tensorflow.html",
+        disqus_config = function () {
+            this.language = "en";
+        };
+        (function() {
+            var dsq = document.createElement('script'); dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+    <a href="https://disqus.com" class="dsq-brlink" rel="nofollow">Comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+        </section><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-SDRP1VVYu+tgAGKhddBSl5+ezofHKZeI+OzxakbIe/Y=" crossorigin="anonymous"></script><script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$latex ','$'], ['\\(','\\)']]}});
+        </script></article><script>var disqus_shortname="post2web-github-io";(function(){var a=document.createElement("script");a.async=true;a.src="https://"+disqus_shortname+".disqus.com/count.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)}());</script>
+</div>
+        <!--End of body content-->
+
+        <footer id="footer"><div class="text-center">
+<p>
+	<span class="fa-stack fa-2x">
+	  <a href="../../rss.xml">
+	    <i class="fa fa-circle fa-stack-2x"></i>
+	    <i class="fa fa-rss fa-inverse fa-stack-1x"></i>
+	  </a>
+	</span>
+	<span class="fa-stack fa-2x">
+	  <a href="https://github.com/post2web">
+	    <i class="fa fa-circle fa-stack-2x"></i>
+	    <i class="fa fa-github fa-inverse fa-stack-1x"></i>
+	  </a>
+	</span>
+	<span class="fa-stack fa-2x">
+	  <a href="https://www.linkedin.com/in/ivelin-angelov">
+	    <i class="fa fa-circle fa-stack-2x"></i>
+	    <i class="fa fa-linkedin fa-inverse fa-stack-1x"></i>
+	  </a>
+	</span>
+	<span class="fa-stack fa-2x">
+	  <a href="mailto:post2web@gmail.com">
+	    <i class="fa fa-circle fa-stack-2x"></i>
+	    <i class="fa fa-envelope fa-inverse fa-stack-1x"></i>
+	  </a>
+	</span>
+</p>
+<p>
+  Contents © 2018  <a href="mailto:post2web@gmail.com">Ivelin Angelov</a>
+  —
+  
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png"></a><br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
+  —
+  Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a>
+</p>
+</div>
+
+            
+        </footer>
+</div>
+</div>
+
+
+            <script src="../../assets/js/all-nocdn.js"></script><script>$('a.image-reference:not(.islink) img:not(.islink)').parent().colorbox({rel:"gal",maxWidth:"100%",maxHeight:"100%",scalePhotos:true});</script><!-- fancy dates --><script>
+    moment.locale("en");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script><!-- end fancy dates -->
+</body>
+</html>
