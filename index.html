@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="description" content="This is my data science blog.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evo's Data Science Blog (page 1) | Evo's Data Science Blog</title>
+<title>Evo's TL; DR Data Science Blog (page 1) | Evo's TL; DR Data Science Blog</title>
 <link href="assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
 <link href="assets/css/ipython.min.css" rel="stylesheet" type="text/css">
 <link href="assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
@@ -13,7 +13,7 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
 <link rel="canonical" href="https://post2web.github.io/">
 <!--[if lt IE 9]><script src="assets/js/html5.js"></script><![endif]--><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-<link rel="prefetch" href="posts/jupyter-blogging/" type="text/html">
+<link rel="prefetch" href="posts/embeddings-with-tensorflow/" type="text/html">
 </head>
 <body>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
@@ -31,7 +31,7 @@
             </button>
             <a class="navbar-brand" href="https://post2web.github.io/">
 
-                <span id="blog-title">Evo's Data Science Blog</span>
+                <span id="blog-title">Evo's TL; DR Data Science Blog</span>
             </a>
         </div>
 <!-- /.navbar-header -->
@@ -39,9 +39,6 @@
             <ul class="nav navbar-nav">
 <li class="active">
 <a href=".">Blog <span class="sr-only">(active)</span></a>
-                </li>
-<li>
-<a href="pages/about">About</a>
                 </li>
 <li>
 <a href="archive.html">Archive</a>
@@ -69,7 +66,43 @@
 
     
 <div class="postindex">
-    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/jupyter-blogging/" class="u-url">Jupyter Blogging</a></h1>
+    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/embeddings-with-tensorflow/" class="u-url">Embeddings with TensorFlow</a></h1>
+        <div class="metadata">
+            <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
+                Ivelin Angelov
+            </span></p>
+            <p class="dateline"><a href="posts/embeddings-with-tensorflow/" rel="bookmark"><time class="published dt-published" datetime="2018-01-19T16:00:40-08:00" title="2018-01-19 16:00">2018-01-19 16:00</time></a></p>
+                <p class="commentline">
+        
+    <a href="posts/embeddings-with-tensorflow/#disqus_thread" data-disqus-identifier="cache/posts/embeddings-with-tensorflow.html">Comments</a>
+
+
+        </p>
+</div>
+    </header><div class="p-summary entry-summary">
+    <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Embeddings-in-TensorFlow">Embeddings in TensorFlow<a class="anchor-link" href="posts/embeddings-with-tensorflow/#Embeddings-in-TensorFlow">¶</a>
+</h2>
+<p>To represent discrete values such as words to a machine learning algorithm we need to transform every class to a one-hot encoded vector or to an embedding vector.</p>
+<p>Using embeddings for a sparse data often results in more efficient representation as compared to the one-hot encoding approach. For example, a typical vocabulary size for NLP problems is usually from 20,000 to 200,000 unique words. It will be very inefficient to represent every word by a vector of thousands of 0s were and one 1.</p>
+<p>Embeddings can also be "trained" by an optimizer to have different similarity to each other which could represent semantic similarity between words for example. A model using trained embeddings could, for example, predict a test dataset with words unseen before in the training dataset and still have a logical inference based on similar words before seen when training.</p>
+<p>In this post, I'll show and describe use cases of embeddings with Python and TensorFlow.
+</p>
+<p class="more"><a href="posts/embeddings-with-tensorflow/">Read more…</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    </article><article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/jupyter-blogging/" class="u-url">Jupyter Blogging</a></h1>
         <div class="metadata">
             <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
                 Ivelin Angelov
