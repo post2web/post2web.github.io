@@ -11775,72 +11775,1356 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Jupyter-Blogging-in-5-minutes.">Jupyter Blogging in 5 minutes.<a class="anchor-link" href="#Jupyter-Blogging-in-5-minutes.">&#182;</a></h1><p>Q: What is Jupyter Blogging?<br/>
-A: Blogging with jupyter notebooks.</p>
-<p>Q: Why Jupyter Blogging?<br/>
-A: As a Data Scientists, I use jupyter to create notebooks with code, equations, visualizations, documentation, etc. "Jupyter Blogging" allows me to share those notebooks with the world without any additional work.</p>
-<p>Q: How is this achieved?<br/>
-A: <a href="http://jupyter.org">Jupyter Notebook</a> + 
-<a href="https://pages.github.com">Github Pages</a> + 
-<a href="https://getnikola.com">Nikola</a> = Jupyter Blogging.</p>
-<p>This tutorial will give you basic instructions for setting up a minimum blog powered by jupyter notebooks. This tutorial is written on a jupyter notebook.
+<h1 id="Embeddings-in-TensorFlow">Embeddings in TensorFlow<a class="anchor-link" href="#Embeddings-in-TensorFlow">&#182;</a></h1><p>To represent discrete values such as words to a machine learning algorithm we need to transform every class to a one-hot encoded vector or to an embedding vector.</p>
+<p>Using embeddings for a sparse data often results in more efficient representation as compared to the one-hot encoding approach. For example, a typical vocabulary size for NLP problems is usually from 20,000 to 200,000 unique words. It will be very inefficient to represent every word by a vector of thousands of 0s were and one 1.</p>
+<p>Embeddings can also be "trained" by an optimizer to have different similarity to each other which could represent semantic similarity between words for example. A model using trained embeddings could, for example, predict a test dataset with words unseen before in the training dataset and still have a logical inference based on similar words before seen when training.</p>
+<p>In this post, I'll show and describe use cases of embeddings with Python and TensorFlow.
 <!-- TEASER_END --></p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Github-Pages-initial-setup">Github Pages initial setup<a class="anchor-link" href="#Github-Pages-initial-setup">&#182;</a></h2><p>Github Pages will do the hosting in addition to versioning of your blog.</p>
-<ol>
-<li>Create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</li>
-<li>Clone it as so:
-<pre><code>`shell
-git clone https://github.com/username/username.github.io
-cd username.github.io</code></pre>
-In addition, any project you have on github that has a <code>gh-pages</code> branch can be accessed via 
-<pre><code>username.github.io/your-project</code></pre>
-</li>
-</ol>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Nikola-setup">Nikola setup<a class="anchor-link" href="#Nikola-setup">&#182;</a></h2><p>Nikola will render all the HTML from the notebooks in a way that creates a blog structure.</p>
-<ol>
-<li>Install Nikola with pip:<div class="highlight"><pre><span></span>pip install <span class="s2">&quot;Nikola[extras]&quot;</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">env</span> CUDA_VISIBLE_DEVICES=&#39;&#39;
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
-</li>
-<li><p>Create Nikola project (inside website root directory):</p>
-<div class="highlight"><pre><span></span>nikola init .
-</pre></div>
-<p>This will bring a prompt with bunch of questions as "site name". All answers will modify <code>conf.py</code> file. You can use the dafault for everything and later on modify <code>conf.py</code>.</p>
-</li>
-<li><p>In order to use Jupyter notebooks, we need to edit the conf.py file that was just generated. Scroll down until you see POSTS and PAGES declaration and add .ipynb files lines.</p>
-<pre>
-POSTS = (
- <b>("posts/*.ipynb", "posts", "post.tmpl"), # -- add this line</b>
- ("posts/*.rst", "posts", "post.tmpl"),
- ("posts/*.md", "posts", "post.tmpl"),
- ("posts/*.txt", "posts", "post.tmpl"),
- ("posts/*.html", "posts", "post.tmpl"),
-)
-PAGES = (
- <b>("pages/*.ipynb", "pages", "page.tmpl"), # -- add this line</b>
- ("pages/*.rst", "pages", "page.tmpl"),
- ("pages/*.md", "pages", "page.tmpl"),
- ("pages/*.txt", "pages", "page.tmpl"),
- ("pages/*.html", "pages", "page.tmpl"),
-)
-</pre></li>
-</ol>
 
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>env: CUDA_VISIBLE_DEVICES=&#39;&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For this example, we will use words in the text as a use case for demonstrating using embeddings but it is important to point out that embeddings can be used to represent discrete values other than words. Before we feed a text into a machine learning model we need to pre-process it and the first step is often tokenization. I will split some text to create example tokens (words).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;My cat is a great cat&#39;</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Words in the our text:&#39;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Words in the our text: [&#39;my&#39;, &#39;cat&#39;, &#39;is&#39;, &#39;a&#39;, &#39;great&#39;, &#39;cat&#39;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Define the vocabulary out of the tokens:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vocab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">vocab</span><span class="p">)</span>
+<span class="n">vocab</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[3]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>great    0
+cat      1
+my       2
+a        3
+is       4
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To convert such text to one-hot vectors we can just use Pandas or any other library in python.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[4]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>cat</th>
+      <th>great</th>
+      <th>is</th>
+      <th>my</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>One-hot encoding in Python and then sending it to TensorFlow could be very inefficient. It will be better to use the built-in method in TensorFlow <code>tf.one_hot for</code> that. It expects integer representation for every class and the total number of classes. For our words example, we need to assign a unique integer for every unique word.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">word_ids</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tokens</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">word_ids</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[5]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([2, 1, 4, 3, 0, 1])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="One-Hot-with-TensorFlow">One-Hot with TensorFlow<a class="anchor-link" href="#One-Hot-with-TensorFlow">&#182;</a></h1><p>We are only passing integers instead of potentially huge vectors to TensorFlow and it will internally convert the integers to one-hot vectors.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+
+<span class="c1"># TensorFlow has an operation for one-hot encoding</span>
+<span class="n">one_hot_inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">))</span>
+
+<span class="n">transformed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">one_hot_inputs</span><span class="p">,</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">word_ids</span><span class="p">})</span>
+<span class="n">transformed</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[0., 0., 1., 0., 0.],
+       [0., 1., 0., 0., 0.],
+       [0., 0., 0., 0., 1.],
+       [0., 0., 0., 1., 0.],
+       [1., 0., 0., 0., 0.],
+       [0., 1., 0., 0., 0.]], dtype=float32)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Embeddings-with-TensorFlow">Embeddings with TensorFlow<a class="anchor-link" href="#Embeddings-with-TensorFlow">&#182;</a></h1><p>With embeddings representation, every word will be transformed into a vector of real numbers with a chosen length <code>(embedding_size)</code>.</p>
+<p>This example is created with <code>embedding_size = 3</code> in order to easily output the <code>embeddings</code> vectors. It means that every word is represented by a vector of 3 real numbers. In practice, a common size for word embedding size is 200 or 300.</p>
+<p>The tensor <code>embeddings</code> is a two dimensional matrix of type tf.float32 with <code>len(vocab)</code> rows and <code>embedding_size</code>  columns. The method <code>tf.nn.embedding_lookup</code> converts our inputs from integers representing words to vectors form the embeddings matrix where every input integer is the index of a row from the <code>embeddings</code>. Every row of the <code>embeddings</code> matrix is a vector representing a word so every word will be represented as a point in <code>embedding_size</code> dimensional space. The tensor <code>embeddings</code> has a random initialization so its content will be different every time and by default, the embeddings will not represent any relationship (as syntactic similarities) between them.</p>
+<p>The example below transorms our text of six words to a 6x3 array. The second word "cat" is the second and the last word in the text so the second resulting vector is the same as the last one.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">embedding_size</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;word_ids&#39;</span><span class="p">)</span>
+
+<span class="c1"># This is where the embedding vectors live</span>
+<span class="c1"># This will be modified by the optimization unless trainable=False</span>
+<span class="c1"># I choose random normal distribution but you can try other distributions</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">),</span> <span class="n">embedding_size</span><span class="p">))</span>
+
+<span class="c1"># this will return the embedding lookup</span>
+<span class="n">embedded</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+<span class="n">transformed</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embedded</span><span class="p">,</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">word_ids</span><span class="p">})</span>
+<span class="n">transformed</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[7]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[-0.02937758, -0.60863554,  1.1070673 ],
+       [ 0.5732564 , -0.7388431 ,  0.30292028],
+       [-0.21285258, -1.8346152 , -1.9110047 ],
+       [ 0.6378179 ,  1.3454263 , -0.8725002 ],
+       [-0.89525574, -0.79854083, -0.40036395],
+       [ 0.5732564 , -0.7388431 ,  0.30292028]], dtype=float32)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here is the content of the embeddings matrix. It has only five rows because of there are five unique words in the vocabulary.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[8]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[ 2.1316075 , -1.061635  ,  0.7775889 ],
+       [ 1.5460204 , -0.6848818 ,  0.21591993],
+       [-1.3386676 ,  1.6173289 ,  0.7851124 ],
+       [ 0.3835993 ,  0.2665336 , -0.32107848],
+       [ 0.08313944,  1.1281649 , -1.151932  ]], dtype=float32)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The method <code>tf.nn.embedding_lookup</code> index to column lookup. If we pass [0, 2] as inputs for the lookup we'll get the first and third row from the embeddings back.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embedded</span><span class="p">,</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[9]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[-0.26338172,  0.06488156, -0.14654125],
+       [ 0.44013414,  0.22667229,  0.5294355 ]], dtype=float32)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Pretrained-embedings">Pretrained embedings<a class="anchor-link" href="#Pretrained-embedings">&#182;</a></h1><p>When the tensor <code>embeddings</code> is created, will be initialised by a random initialization and the distance between words will also have random values. In order to have any similarity between the vectors, we can train them with models like word2vec or use pre-trained vectors.</p>
+<p>An easy way to get pre-train vectors is with a package called <code>chakin</code>. The project lives <a href="https://github.com/chakki-works/chakin">here</a>. To install it:</p>
+
+<pre><code>pip install chakin</code></pre>
+<p>To list the available pre-trained word vectors:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">chakin</span>
+
+<span class="n">chakin</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;English&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>                   Name  Dimension                     Corpus VocabularySize  \
+2          fastText(en)        300                  Wikipedia           2.5M   
+11         GloVe.6B.50d         50  Wikipedia+Gigaword 5 (6B)           400K   
+12        GloVe.6B.100d        100  Wikipedia+Gigaword 5 (6B)           400K   
+13        GloVe.6B.200d        200  Wikipedia+Gigaword 5 (6B)           400K   
+14        GloVe.6B.300d        300  Wikipedia+Gigaword 5 (6B)           400K   
+15       GloVe.42B.300d        300          Common Crawl(42B)           1.9M   
+16      GloVe.840B.300d        300         Common Crawl(840B)           2.2M   
+17    GloVe.Twitter.25d         25               Twitter(27B)           1.2M   
+18    GloVe.Twitter.50d         50               Twitter(27B)           1.2M   
+19   GloVe.Twitter.100d        100               Twitter(27B)           1.2M   
+20   GloVe.Twitter.200d        200               Twitter(27B)           1.2M   
+21  word2vec.GoogleNews        300          Google News(100B)           3.0M   
+
+      Method Language    Author  
+2   fastText  English  Facebook  
+11     GloVe  English  Stanford  
+12     GloVe  English  Stanford  
+13     GloVe  English  Stanford  
+14     GloVe  English  Stanford  
+15     GloVe  English  Stanford  
+16     GloVe  English  Stanford  
+17     GloVe  English  Stanford  
+18     GloVe  English  Stanford  
+19     GloVe  English  Stanford  
+20     GloVe  English  Stanford  
+21  word2vec  English    Google  
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To get the Facebooks's fastText model:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">chakin</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Test: 100% ||                                       | Time: 0:03:12  32.6 MiB/s
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[11]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;./wiki.en.vec&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It downloads a .vec file in the current directory. The .vec files are text files similar to .csv files. The first column has two numbers for the number of vocabulary and dimensions of the vectors and the reset is token and numbers separated by a space. I just load the file with pd.read_csv but there may be other more efficient ways to do it.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;wiki.en.vec&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+<span class="n">vectors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s1">&#39;wiki.en.vec&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+<span class="c1"># remove one junk column</span>
+<span class="n">vectors</span> <span class="o">=</span> <span class="n">vectors</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+<span class="n">vectors</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[12]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+      <th>...</th>
+      <th>291</th>
+      <th>292</th>
+      <th>293</th>
+      <th>294</th>
+      <th>295</th>
+      <th>296</th>
+      <th>297</th>
+      <th>298</th>
+      <th>299</th>
+      <th>300</th>
+    </tr>
+    <tr>
+      <th>0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>,</th>
+      <td>-0.023167</td>
+      <td>-0.004248</td>
+      <td>-0.105720</td>
+      <td>0.042783</td>
+      <td>-0.143160</td>
+      <td>-0.078954</td>
+      <td>0.078187</td>
+      <td>-0.194540</td>
+      <td>0.022303</td>
+      <td>0.312070</td>
+      <td>...</td>
+      <td>0.046595</td>
+      <td>-0.11558</td>
+      <td>0.044184</td>
+      <td>-0.023124</td>
+      <td>0.025860</td>
+      <td>-0.116530</td>
+      <td>0.010936</td>
+      <td>0.089398</td>
+      <td>-0.01590</td>
+      <td>0.148660</td>
+    </tr>
+    <tr>
+      <th>.</th>
+      <td>-0.111120</td>
+      <td>-0.001386</td>
+      <td>-0.177800</td>
+      <td>0.064508</td>
+      <td>-0.240370</td>
+      <td>0.031087</td>
+      <td>-0.030144</td>
+      <td>-0.368830</td>
+      <td>-0.043855</td>
+      <td>0.248310</td>
+      <td>...</td>
+      <td>0.095332</td>
+      <td>-0.21914</td>
+      <td>-0.042760</td>
+      <td>-0.136850</td>
+      <td>0.097470</td>
+      <td>-0.218180</td>
+      <td>-0.058233</td>
+      <td>0.063374</td>
+      <td>-0.12161</td>
+      <td>0.039339</td>
+    </tr>
+    <tr>
+      <th>the</th>
+      <td>-0.065334</td>
+      <td>-0.093031</td>
+      <td>-0.017571</td>
+      <td>0.200070</td>
+      <td>0.029521</td>
+      <td>-0.039920</td>
+      <td>-0.163280</td>
+      <td>-0.072946</td>
+      <td>0.089604</td>
+      <td>0.080907</td>
+      <td>...</td>
+      <td>0.064944</td>
+      <td>-0.21673</td>
+      <td>-0.037683</td>
+      <td>0.081860</td>
+      <td>-0.039891</td>
+      <td>-0.051334</td>
+      <td>-0.101650</td>
+      <td>0.166420</td>
+      <td>-0.13079</td>
+      <td>0.035397</td>
+    </tr>
+    <tr>
+      <th>&lt;/s&gt;</th>
+      <td>0.050258</td>
+      <td>-0.073228</td>
+      <td>0.435810</td>
+      <td>0.174830</td>
+      <td>-0.185460</td>
+      <td>-0.399210</td>
+      <td>-0.507670</td>
+      <td>-0.506600</td>
+      <td>-0.155570</td>
+      <td>0.031451</td>
+      <td>...</td>
+      <td>-0.096853</td>
+      <td>-0.47723</td>
+      <td>-0.027511</td>
+      <td>0.259640</td>
+      <td>-0.010468</td>
+      <td>-0.298150</td>
+      <td>-0.236090</td>
+      <td>0.205250</td>
+      <td>0.75183</td>
+      <td>0.097156</td>
+    </tr>
+    <tr>
+      <th>of</th>
+      <td>0.048804</td>
+      <td>-0.285280</td>
+      <td>0.018557</td>
+      <td>0.205770</td>
+      <td>0.060704</td>
+      <td>0.085446</td>
+      <td>-0.036267</td>
+      <td>-0.068373</td>
+      <td>0.145070</td>
+      <td>0.178520</td>
+      <td>...</td>
+      <td>0.169560</td>
+      <td>-0.33677</td>
+      <td>-0.060286</td>
+      <td>0.086097</td>
+      <td>-0.065001</td>
+      <td>0.004833</td>
+      <td>-0.100960</td>
+      <td>0.139100</td>
+      <td>-0.13714</td>
+      <td>-0.039705</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 300 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Every word in this model is represented by a vector of 300 number. Here is the vector for the word "car":</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;car&#39;</span><span class="p">]]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[13]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+      <th>...</th>
+      <th>291</th>
+      <th>292</th>
+      <th>293</th>
+      <th>294</th>
+      <th>295</th>
+      <th>296</th>
+      <th>297</th>
+      <th>298</th>
+      <th>299</th>
+      <th>300</th>
+    </tr>
+    <tr>
+      <th>0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>car</th>
+      <td>-0.092271</td>
+      <td>-0.14855</td>
+      <td>-0.14696</td>
+      <td>0.013</td>
+      <td>-0.40305</td>
+      <td>-0.31004</td>
+      <td>0.1022</td>
+      <td>-0.42087</td>
+      <td>-0.22948</td>
+      <td>0.12853</td>
+      <td>...</td>
+      <td>0.096352</td>
+      <td>0.031328</td>
+      <td>0.31818</td>
+      <td>-0.18818</td>
+      <td>0.14998</td>
+      <td>-0.18162</td>
+      <td>-0.35564</td>
+      <td>0.28245</td>
+      <td>-0.18557</td>
+      <td>-0.060884</td>
+    </tr>
+  </tbody>
+</table>
+<p>1 rows × 300 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To demonstrate similarity, we can use cosine distance.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">cosine_similarity</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Similarity:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;   bus to car =&#39;</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;bus&#39;</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;car&#39;</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;   bus to dog =&#39;</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;bus&#39;</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;cat&#39;</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;   dog to cat =&#39;</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;dog&#39;</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;cat&#39;</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;   cat to car =&#39;</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;dog&#39;</span><span class="p">]],</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;bus&#39;</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Similarity:
+   bus to car = 0.46000568082170107
+   bus to dog = 0.17041678778979216
+   dog to cat = 0.6380517245741392
+   cat to car = 0.15984959272698984
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to use this vectors for our vocabulary, we need to put them in the same order.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pretrained_embeddings</span> <span class="o">=</span> <span class="n">vectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vocab</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">pretrained_embeddings</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[15]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+      <th>...</th>
+      <th>291</th>
+      <th>292</th>
+      <th>293</th>
+      <th>294</th>
+      <th>295</th>
+      <th>296</th>
+      <th>297</th>
+      <th>298</th>
+      <th>299</th>
+      <th>300</th>
+    </tr>
+    <tr>
+      <th>0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>great</th>
+      <td>-0.267620</td>
+      <td>-0.081004</td>
+      <td>-0.21283</td>
+      <td>0.380140</td>
+      <td>-0.156980</td>
+      <td>-0.167050</td>
+      <td>0.370720</td>
+      <td>0.108050</td>
+      <td>0.293960</td>
+      <td>0.159460</td>
+      <td>...</td>
+      <td>-0.115460</td>
+      <td>-0.10987</td>
+      <td>0.285300</td>
+      <td>-0.071547</td>
+      <td>-0.253600</td>
+      <td>-0.101550</td>
+      <td>-0.013372</td>
+      <td>0.105520</td>
+      <td>0.037726</td>
+      <td>0.253640</td>
+    </tr>
+    <tr>
+      <th>cat</th>
+      <td>-0.138190</td>
+      <td>0.140290</td>
+      <td>-0.32621</td>
+      <td>0.116240</td>
+      <td>-0.198060</td>
+      <td>0.455260</td>
+      <td>0.212820</td>
+      <td>-0.512560</td>
+      <td>0.033657</td>
+      <td>0.154290</td>
+      <td>...</td>
+      <td>0.151850</td>
+      <td>-0.32703</td>
+      <td>0.102690</td>
+      <td>-0.053309</td>
+      <td>-0.068975</td>
+      <td>-0.006616</td>
+      <td>-0.066738</td>
+      <td>0.273190</td>
+      <td>0.520030</td>
+      <td>-0.008721</td>
+    </tr>
+    <tr>
+      <th>my</th>
+      <td>-0.126860</td>
+      <td>0.152880</td>
+      <td>0.14903</td>
+      <td>0.039269</td>
+      <td>-0.130520</td>
+      <td>-0.038069</td>
+      <td>-0.162300</td>
+      <td>-0.002766</td>
+      <td>0.121190</td>
+      <td>0.142020</td>
+      <td>...</td>
+      <td>0.062873</td>
+      <td>0.14942</td>
+      <td>-0.146160</td>
+      <td>-0.210860</td>
+      <td>0.321350</td>
+      <td>-0.037258</td>
+      <td>-0.060301</td>
+      <td>0.419110</td>
+      <td>0.032854</td>
+      <td>-0.123030</td>
+    </tr>
+    <tr>
+      <th>a</th>
+      <td>0.115590</td>
+      <td>0.301920</td>
+      <td>-0.11465</td>
+      <td>0.010010</td>
+      <td>-0.032187</td>
+      <td>-0.107550</td>
+      <td>0.060674</td>
+      <td>-0.104770</td>
+      <td>0.174880</td>
+      <td>0.008112</td>
+      <td>...</td>
+      <td>-0.020257</td>
+      <td>-0.18694</td>
+      <td>-0.065594</td>
+      <td>-0.202230</td>
+      <td>-0.122180</td>
+      <td>-0.297980</td>
+      <td>0.034272</td>
+      <td>0.110480</td>
+      <td>0.130740</td>
+      <td>0.041164</td>
+    </tr>
+    <tr>
+      <th>is</th>
+      <td>0.035927</td>
+      <td>0.145170</td>
+      <td>0.11926</td>
+      <td>0.078836</td>
+      <td>-0.047748</td>
+      <td>0.100960</td>
+      <td>0.090815</td>
+      <td>-0.221760</td>
+      <td>-0.095085</td>
+      <td>-0.022610</td>
+      <td>...</td>
+      <td>0.040324</td>
+      <td>-0.27410</td>
+      <td>-0.116330</td>
+      <td>-0.089418</td>
+      <td>-0.072754</td>
+      <td>-0.260430</td>
+      <td>0.084246</td>
+      <td>-0.001608</td>
+      <td>0.170800</td>
+      <td>-0.035512</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 300 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Using-pre-trained-Embeddings-with-TensorFlow">Using pre-trained Embeddings with TensorFlow<a class="anchor-link" href="#Using-pre-trained-Embeddings-with-TensorFlow">&#182;</a></h1><p>Instead of random values I can now initialize the <code>embeddings</code> with <code>pretrained_embeddings</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">pretrained_embeddings</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">embedded</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+<span class="n">transformed</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">embedded</span><span class="p">,</span> <span class="p">{</span><span class="n">inputs</span><span class="p">:</span> <span class="n">word_ids</span><span class="p">})</span>
+<span class="n">transformed</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[16]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[-0.12686  ,  0.15288  ,  0.14903  , ...,  0.41911  ,  0.032854 ,
+        -0.12303  ],
+       [-0.13819  ,  0.14029  , -0.32621  , ...,  0.27319  ,  0.52003  ,
+        -0.0087214],
+       [ 0.035927 ,  0.14517  ,  0.11926  , ..., -0.0016082,  0.1708   ,
+        -0.035512 ],
+       [ 0.11559  ,  0.30192  , -0.11465  , ...,  0.11048  ,  0.13074  ,
+         0.041164 ],
+       [-0.26762  , -0.081004 , -0.21283  , ...,  0.10552  ,  0.037726 ,
+         0.25364  ],
+       [-0.13819  ,  0.14029  , -0.32621  , ...,  0.27319  ,  0.52003  ,
+        -0.0087214]])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Training-your-embeddings">Training your embeddings<a class="anchor-link" href="#Training-your-embeddings">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -11848,138 +13132,11 @@ PAGES = (
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Create-a-page">Create a page<a class="anchor-link" href="#Create-a-page">&#182;</a></h1><p>Use nikola new_post command to add a new page. I would create an "About" page.</p>
-
-<pre><code>nikola new_page --title="About" --format=markdown</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Create-a-post">Create a post<a class="anchor-link" href="#Create-a-post">&#182;</a></h1><p>After you have an empty blog its time to add new posts.</p>
-<ol>
-<li><p>Use <code>nikola new_post</code> command to add a new post to the blog. When creating a jupyter notebook post specify <code>--format=ipynb</code>. To create a post from existing notebook add option <code>--import=../path/Foo.ipynb</code></p>
-<p>Create a post with a new empty notebook and edit it later:</p>
-
-<pre><code>shell.
- nikola new_post --title="test" --format=ipynb</code></pre>
-<p>Create a post with an existing notebook:</p>
-
-<pre><code>shell.
- nikola new_post --title="test" --format=ipynb --import=../path/Foo.ipynb</code></pre>
-</li>
-<li><p>A new jupyter notebook file <code>posts/test.ipynb</code> has been created. It will be empty unless your imported existing notebook. Optionally, open it with Jupyter to edit it's content.</p>
-</li>
-</ol>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Build">Build<a class="anchor-link" href="#Build">&#182;</a></h1><p>Building will generate HTML from the program files.</p>
-<div class="highlight"><pre><span></span>nikola build
-</pre></div>
-<p>To view and render the blog start Nikola by:</p>
-<div class="highlight"><pre><span></span>nikola serve
-</pre></div>
-<p>Alternatively, you can use <code>nikola auto</code> for build and serve in one command.</p>
-<p>Point your broswer at <code>localhost:8000</code>. As changes are saved to the notebooks, the site will automatically rebuild and refresh, but it may take a few seconds.</p>
-<p>Press <code>Ctrl+C</code> at the command prompt to stop the server.</p>
-<p>For more information see <a href="https://getnikola.com/getting-started.html">Nikola's Getting Started</a></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Delete-or-Update-a-post">Delete or Update a post<a class="anchor-link" href="#Delete-or-Update-a-post">&#182;</a></h2><ul>
-<li><p>To delete a post, delete the post_name.ipynb file inside posts drectory and rebuild.</p>
-<div class="highlight"><pre><span></span>rm -f posts/test.ipynb.ipynb
-nikola build
-</pre></div>
-</li>
-<li><p>To edit a post you can either:</p>
+<p>There are several models for "similarity training" of embeddings. The most popular are:</p>
 <ul>
-<li>edit the file directly with jupyter<div class="highlight"><pre><span></span>jupyter notebook posts/test.ipynb
-</pre></div>
-</li>
-<li><p>delete the post and create one with the same title from an existing notebook</p>
-<div class="highlight"><pre><span></span>rm -f posts/test.ipynb
-nikola new_post --title<span class="o">=</span><span class="s2">&quot;test&quot;</span> --format<span class="o">=</span>ipynb --import<span class="o">=</span>../path/Foo.ipynb
-</pre></div>
-</li>
-</ul>
-</li>
-</ul>
-<p>I cases where things don't get refreshed right after a file delete do:</p>
-
-<pre><code> nikola check -f --clean-files</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Deploy">Deploy<a class="anchor-link" href="#Deploy">&#182;</a></h2><p>Nikola has github_deploy command that will publish to github pages.</p>
-
-<pre><code>nikola github_deploy</code></pre>
-<p>This command will creates two branches on your github: 
-    master - holds the rendered HTML of your site
-    src - holds the files used for rendering as notebooks, configs and other.
-When you clone your repo you need to swithch branch to <code>src</code> in order to modify the site.</p>
-
-<pre><code>git checkout src</code></pre>
-<p>The blog should be live online. Go to <a href="https://username.github.io">https://username.github.io</a> to confirm it is working.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Enable-teaser-for-posts">Enable teaser for posts<a class="anchor-link" href="#Enable-teaser-for-posts">&#182;</a></h2><p>Modify config.py to:</p>
-
-<pre><code>INDEXES_PAGES_MAIN = True # optional
-INDEX_TEASERS = True</code></pre>
-<p>Add this tag to a meta cell where you want the teaser to end:</p>
-
-<pre><code>&lt;!-- TEASER_END --&gt;</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Enable-comments">Enable comments<a class="anchor-link" href="#Enable-comments">&#182;</a></h2><p>Create an account with disqus and modify config.py to:</p>
-
-<pre><code>COMMENT_SYSTEM = "disqus"
-# For DISQUS it's called the shortname
-COMMENT_SYSTEM_ID = "username-github-io"</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Alternatives-to-Nikola">Alternatives to Nikola<a class="anchor-link" href="#Alternatives-to-Nikola">&#182;</a></h2><p>I choose Nikola for site generator because of its built-in Jupyter Notebook support. There are other alternatives that need workarounds to support notebooks.</p>
-<ul>
-<li>Jekyll is the default framework used by github and is probably the most popular framework.</li>
-<li>Pelican, is another site generator and it is more popular than Nikola.</li>
+<li><a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Word2Vec</a></li>
+<li><a href="https://nlp.stanford.edu/projects/glove/">GloVe</a></li>
+<li><a href="https://github.com/facebookresearch/fastText">fastText</a></li>
 </ul>
 
 </div>

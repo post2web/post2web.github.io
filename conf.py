@@ -19,10 +19,10 @@ import time
 
 # Data about this site
 BLOG_AUTHOR = "Ivelin Angelov"  # (translatable)
-BLOG_TITLE = "Evo's Data Science Blog"  # (translatable)
+BLOG_TITLE = "Evo's TL; DR Data Science Blog"  # (translatable)
 # This is the main URL for your site. It will be used
 # in a prominent link. Don't forget the protocol (http/https)!
-SITE_URL = "https://post2web.github.io"
+SITE_URL = "https://post2web.github.io/"
 # This is the URL where Nikola's output will be deployed.
 # If not set, defaults to SITE_URL
 # BASE_URL = "https://example.com/"
@@ -136,7 +136,7 @@ TRANSLATIONS_PATTERN = "{path}.{lang}.{ext}"
 NAVIGATION_LINKS = {
     DEFAULT_LANG: (
         ("/", "Blog"),
-        ("/pages/about", "About"),
+#        ("/pages/about", "About"),
         ("/archive.html", "Archive"),
         ("/rss.xml", "RSS feed"),
     ),
