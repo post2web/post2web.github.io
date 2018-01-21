@@ -90,8 +90,8 @@
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Word2Vec-with-Skip-Gram-and-TensorFlow">Word2Vec with Skip-Gram and TensorFlow<a class="anchor-link" href="posts/word2vec-with-tensorflow/#Word2Vec-with-Skip-Gram-and-TensorFlow">¶</a>
 </h2>
-<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings read my previous post.</p>
-<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representation:">The word2vec model can be trained with two different word representation:<a class="anchor-link" href="posts/word2vec-with-tensorflow/#The-word2vec-model-can-be-trained-with-two-different-word-representation:">¶</a>
+<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings, read my previous post.</p>
+<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representations:">The word2vec model can be trained with two different word representations:<a class="anchor-link" href="posts/word2vec-with-tensorflow/#The-word2vec-model-can-be-trained-with-two-different-word-representations:">¶</a>
 </h4>
 <ul>
 <li>
@@ -101,9 +101,8 @@
 </ul>
 <h4 id="Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">Skip-Gram tends to do better and this tutorial will implement a word2vec with skip-grams.<a class="anchor-link" href="posts/word2vec-with-tensorflow/#Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">¶</a>
 </h4>
-<p>The goal of the model is to train it embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors:</p>
-<h5 id="[king]---[man]-+-[woman]-~=-[queen]">[king] - [man] + [woman] ~= [queen]<a class="anchor-link" href="posts/word2vec-with-tensorflow/#%5Bking%5D---%5Bman%5D-+-%5Bwoman%5D-~=-%5Bqueen%5D">¶</a>
-</h5>
+<p>The goal of the model is to train it's embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors: <b>[king] - [man] + [woman] ~= [queen]</b>
+</p>
 <p class="more"><a href="posts/word2vec-with-tensorflow/">Read more…</a></p>
 </div>
 </div>
@@ -135,9 +134,9 @@
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Embeddings-in-TensorFlow">Embeddings in TensorFlow<a class="anchor-link" href="posts/embeddings-with-tensorflow/#Embeddings-in-TensorFlow">¶</a>
 </h2>
-<p>To represent discrete values such as words to a machine learning algorithm we need to transform every class to a one-hot encoded vector or to an embedding vector.</p>
-<p>Using embeddings for a sparse data often results in more efficient representation as compared to the one-hot encoding approach. For example, a typical vocabulary size for NLP problems is usually from 20,000 to 200,000 unique words. It will be very inefficient to represent every word by a vector of thousands of 0s were and one 1.</p>
-<p>Embeddings can also be "trained" by an optimizer to have different similarity to each other which could represent semantic similarity between words for example. A model using trained embeddings could, for example, predict a test dataset with words unseen before in the training dataset and still have a logical inference based on similar words before seen when training.</p>
+<p>To represent discrete values such as words to a machine learning algorithm, we need to transform every class to a one-hot encoded vector or to an embedding vector.</p>
+<p>Using embeddings for a sparse data often results in more efficient representation as compared to the one-hot encoding approach. For example, a typical vocabulary size for NLP problems is usually from 20,000 to 200,000 unique words. It will be very inefficient to represent every word by a vector of thousands of 0s and only one 1.</p>
+<p>Embeddings can also be "trained" by an optimizer to have different similarities which could represent semantic similarities between words. For example, a model using trained embeddings could predict a test dataset with words unseen before in the training dataset and still have a logical inference based on similar words before seen when training.</p>
 <p>In this post, I'll show and describe use cases of embeddings with Python and TensorFlow.
 </p>
 <p class="more"><a href="posts/embeddings-with-tensorflow/">Read more…</a></p>

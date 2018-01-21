@@ -102,8 +102,8 @@
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Word2Vec-with-Skip-Gram-and-TensorFlow">Word2Vec with Skip-Gram and TensorFlow<a class="anchor-link" href="#Word2Vec-with-Skip-Gram-and-TensorFlow">¶</a>
 </h2>
-<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings read my previous post.</p>
-<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representation:">The word2vec model can be trained with two different word representation:<a class="anchor-link" href="#The-word2vec-model-can-be-trained-with-two-different-word-representation:">¶</a>
+<p>This is a tutorial and a basic example for getting started with word2vec model by <a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et al</a>. It is used for learning vector representations of words, called "Words Embeddings". For more information about Embeddings, read my previous post.</p>
+<h4 id="The-word2vec-model-can-be-trained-with-two-different-word-representations:">The word2vec model can be trained with two different word representations:<a class="anchor-link" href="#The-word2vec-model-can-be-trained-with-two-different-word-representations:">¶</a>
 </h4>
 <ul>
 <li>
@@ -113,10 +113,9 @@
 </ul>
 <h4 id="Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">Skip-Gram tends to do better and this tutorial will implement a word2vec with skip-grams.<a class="anchor-link" href="#Skip-Gram-tends-to-do-better-and-this-tutorial-will-implement-a-word2vec-with-skip-grams.">¶</a>
 </h4>
-<p>The goal of the model is to train it embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors:</p>
-<h5 id="[king]---[man]-+-[woman]-~=-[queen]">[king] - [man] + [woman] ~= [queen]<a class="anchor-link" href="#%5Bking%5D---%5Bman%5D-+-%5Bwoman%5D-~=-%5Bqueen%5D">¶</a>
-</h5>
-<!-- TEASER_END -->
+<p>The goal of the model is to train it's embeddings layer in a way that similar by meaning words are close to each other in their N-dimensional vector representation. The model has two layers: the embeddings layer and a linear layer. Because of the last layer is linear, the distance between embedding vectors for words is linearly related to the distance in the meaning of those words. In other words, we are able to do such mathematical operations with the vectors: <b>[king] - [man] + [woman] ~= [queen]</b>
+<!-- TEASER_END --></p>
+
 </div>
 </div>
 </div>
@@ -164,7 +163,7 @@
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Dataset">Dataset<a class="anchor-link" href="#Dataset">¶</a>
 </h2>
-<p>To train a word2vec model we need a large text corpus. This example uses text from the "20 newsgroups dataset". The dataset contains 11314 messages form a message board with corresponding labels for its topic. We just merge all messages together and ignore the labels. In practice, it's better to use a larger corpus and to have a domain-specific text. Lowering the case of the text is optional and will small corpus will be better ot have it lowered.</p>
+<p>To train a word2vec model, we need a large text corpus. This example uses the text from the "20 newsgroups dataset". The dataset contains 11314 messages form a message board with corresponding labels for its topics. We just merge all messages together and ignore the labels. In practice, it's better to use a larger corpus and to have a domain-specific text. Lowering the case of the text is optional and recommended when working with a small corpus.</p>
 
 </div>
 </div>
