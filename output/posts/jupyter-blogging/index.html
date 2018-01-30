@@ -134,10 +134,9 @@ A: <a href="http://jupyter.org">Jupyter Notebook</a> +
 <p>Github Pages will do the hosting in addition to versioning of your blog.</p>
 <ol>
 <li>Create a new repository named username.github.io, where username is your username (or organization name) on GitHub.</li>
-<li>Clone it as so:
-<pre><code>`shell
-git clone https://github.com/username/username.github.io
-cd username.github.io</code></pre>
+<li>Clone it as so:<div class="highlight"><pre><span></span>git clone https://github.com/username/username.github.io
+<span class="nb">cd</span> username.github.io
+</pre></div>
 In addition, any project you have on github that has a <code>gh-pages</code> branch can be accessed via 
 <pre><code>username.github.io/your-project</code></pre>
 </li>
@@ -194,8 +193,8 @@ PAGES = (
 <h2 id="Create-a-page">Create a page<a class="anchor-link" href="#Create-a-page">¶</a>
 </h2>
 <p>Use nikola new_post command to add a new page. I would create an "About" page.</p>
-
-<pre><code>nikola new_page --title="About" --format=markdown</code></pre>
+<div class="highlight"><pre><span></span>nikola new_page --title<span class="o">=</span><span class="s2">"About"</span> --format<span class="o">=</span>markdown
+</pre></div>
 
 </div>
 </div>
@@ -212,13 +211,11 @@ PAGES = (
 <li>
 <p>Use <code>nikola new_post</code> command to add a new post to the blog. When creating a jupyter notebook post specify <code>--format=ipynb</code>. To create a post from existing notebook add option <code>--import=../path/Foo.ipynb</code></p>
 <p>Create a post with a new empty notebook and edit it later:</p>
-
-<pre><code>shell.
- nikola new_post --title="test" --format=ipynb</code></pre>
+<div class="highlight"><pre><span></span>nikola new_post --title<span class="o">=</span><span class="s2">"test"</span> --format<span class="o">=</span>ipynb
+</pre></div>
 <p>Create a post with an existing notebook:</p>
-
-<pre><code>shell.
- nikola new_post --title="test" --format=ipynb --import=../path/Foo.ipynb</code></pre>
+<div class="highlight"><pre><span></span>nikola new_post --title<span class="o">=</span><span class="s2">"test"</span> --format<span class="o">=</span>ipynb --import<span class="o">=</span>../path/Foo.ipynb
+</pre></div>
 </li>
 <li>
 <p>A new jupyter notebook file <code>posts/test.ipynb</code> has been created. It will be empty unless your imported existing notebook. Optionally, open it with Jupyter to edit it's content.</p>
@@ -292,14 +289,14 @@ nikola new_post --title<span class="o">=</span><span class="s2">"test"</span> --
 <h3 id="Deploy">Deploy<a class="anchor-link" href="#Deploy">¶</a>
 </h3>
 <p>Nikola has github_deploy command that will publish to github pages.</p>
-
-<pre><code>nikola github_deploy</code></pre>
+<div class="highlight"><pre><span></span>nikola github_deploy
+</pre></div>
 <p>This command will creates two branches on your github: 
     master - holds the rendered HTML of your site
     src - holds the files used for rendering as notebooks, configs and other.
 When you clone your repo you need to swithch branch to <code>src</code> in order to modify the site.</p>
-
-<pre><code>git checkout src</code></pre>
+<div class="highlight"><pre><span></span>git checkout src
+</pre></div>
 <p>The blog should be live online. Go to <a href="https://username.github.io">https://username.github.io</a> to confirm it is working.</p>
 
 </div>
