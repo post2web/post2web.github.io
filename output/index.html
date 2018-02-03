@@ -18,7 +18,7 @@
   gtag('js', new Date());
 
   gtag('config', 'UA-113338661-1');
-</script><link rel="prefetch" href="posts/word2vec-with-tensorflow/" type="text/html">
+</script><link rel="prefetch" href="posts/reuse-jupyter-notebooks/" type="text/html">
 </head>
 <body>
 <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
@@ -71,7 +71,42 @@
 
     
 <div class="postindex">
-    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/word2vec-with-tensorflow/" class="u-url">Word2Vec with TensorFlow</a></h1>
+    <article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/reuse-jupyter-notebooks/" class="u-url">Reuse Jupyter Notebooks</a></h1>
+        <div class="metadata">
+            <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
+                Ivelin Angelov
+            </span></p>
+            <p class="dateline"><a href="posts/reuse-jupyter-notebooks/" rel="bookmark"><time class="published dt-published" datetime="2018-02-03T12:05:01-08:00" title="2018-02-03 12:05">2018-02-03 12:05</time></a></p>
+                <p class="commentline">
+        
+    <a href="posts/reuse-jupyter-notebooks/#disqus_thread" data-disqus-identifier="cache/posts/reuse-jupyter-notebooks.html">Comments</a>
+
+
+        </p>
+</div>
+    </header><div class="p-summary entry-summary">
+    <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id='Use-Jupyter-Notebooks-as-"Objects"'>Use Jupyter Notebooks as "Objects"<a class="anchor-link" href="posts/reuse-jupyter-notebooks/#Use-Jupyter-Notebooks-as-%22Objects%22">¶</a>
+</h2>
+<p>Jupyter Notebooks are great for data exploration, visualizing, documenting, prototyping and interacting with the code, but when it comes to creating a program out of a notebook or using the notebook in porduction they fall short. I often get myself copying cells from a notebook into a script so that I can run the code with command line arguments. There is no easy way to run a notebook and return a result from its execution, can't passing arguments to a notebook or running individual code cells programmatically. Have you ever wrapped a code cell to a function just so you want to call it in a loop with different parameters?</p>
+<p>I wrote a small utility tool <code>nbloader</code> that enables code reusing from jupyter notebooks. With it, you can import a notebook as an object, pass variables to its namespace, run code cells and pull out variables from its namespace.</p>
+<p>This tutorial will show you how to make your notebooks reusable with <code>nbloader</code>.
+</p>
+<p class="more"><a href="posts/reuse-jupyter-notebooks/">Read more…</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    </article><article class="h-entry post-text"><header><h1 class="p-name entry-title"><a href="posts/word2vec-with-tensorflow/" class="u-url">Word2Vec with TensorFlow</a></h1>
         <div class="metadata">
             <p class="byline author vcard"><span class="byline-name fn" itemprop="author">
                 Ivelin Angelov
